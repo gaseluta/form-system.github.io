@@ -1,0 +1,1194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-Purpose Form System</title>
+    <style>
+        :root {
+            --primary: #3498db;
+            --secondary: #2c3e50;
+            --success: #2ecc71;
+            --danger: #e74c3c;
+            --warning: #f39c12;
+            --light: #ecf0f1;
+            --dark: #34495e;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding: 2rem 0;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: var(--secondary);
+            margin-bottom: 0.5rem;
+            font-size: 2.5rem;
+        }
+        
+        .tagline {
+            color: var(--primary);
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+        }
+        
+        .description {
+            max-width: 800px;
+            margin: 0 auto;
+            color: #666;
+        }
+        
+        .forms-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .form-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+        
+        .form-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+        
+        .form-icon {
+            height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--primary);
+            color: white;
+            font-size: 3rem;
+        }
+        
+        .form-content {
+            padding: 1.5rem;
+        }
+        
+        .form-content h3 {
+            color: var(--secondary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .form-content p {
+            color: #666;
+            margin-bottom: 1rem;
+        }
+        
+        .btn {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background 0.3s;
+            text-decoration: none;
+        }
+        
+        .btn:hover {
+            background: #2980b9;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        
+        .modal-content {
+            background: white;
+            max-width: 600px;
+            margin: 2rem auto;
+            border-radius: 10px;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.2);
+            animation: modalFade 0.3s;
+        }
+        
+        @keyframes modalFade {
+            from { opacity: 0; transform: translateY(-50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .modal-header {
+            padding: 1.5rem;
+            background: var(--secondary);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 10px 10px 0 0;
+        }
+        
+        .modal-header h2 {
+            margin: 0;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+        .modal-body {
+            padding: 1.5rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--secondary);
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: border 0.3s;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--primary);
+            outline: none;
+        }
+        
+        .error {
+            color: var(--danger);
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+            display: none;
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .form-row .form-group {
+            flex: 1;
+        }
+        
+        .form-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #eee;
+        }
+        
+        .success-message {
+            background: rgba(46, 204, 113, 0.1);
+            color: var(--success);
+            padding: 1rem;
+            border-radius: 5px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 3rem;
+            padding: 1.5rem;
+            color: #666;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        @media (max-width: 768px) {
+            .forms-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Multi-Purpose Form System</h1>
+            <p class="tagline">All your form needs in one place</p>
+            <p class="description">This system provides various forms for different purposes including contact, registration, login, feedback, orders, bookings, and calculations. All forms include validation and data storage simulation.</p>
+        </header>
+        
+        <div class="forms-grid">
+            <!-- Contact Form Card -->
+            <div class="form-card" data-form="contact">
+                <div class="form-icon">
+                    <i>📧</i>
+                </div>
+                <div class="form-content">
+                    <h3>Contact Form</h3>
+                    <p>Get in touch with us. Send your inquiries, questions, or feedback.</p>
+                    <button class="btn open-form-btn">Open Form</button>
+                </div>
+            </div>
+            
+            <!-- Registration Form Card -->
+            <div class="form-card" data-form="registration">
+                <div class="form-icon">
+                    <i>📝</i>
+                </div>
+                <div class="form-content">
+                    <h3>Registration Form</h3>
+                    <p>Create a new account to access our services and features.</p>
+                    <button class="btn open-form-btn">Open Form</button>
+                </div>
+            </div>
+            
+            <!-- Login Form Card -->
+            <div class="form-card" data-form="login">
+                <div class="form-icon">
+                    <i>🔐</i>
+                </div>
+                <div class="form-content">
+                    <h3>Login Form</h3>
+                    <p>Access your account with your credentials.</p>
+                    <button class="btn open-form-btn">Open Form</button>
+                </div>
+            </div>
+            
+            <!-- Survey Form Card -->
+            <div class="form-card" data-form="survey">
+                <div class="form-icon">
+                    <i>📊</i>
+                </div>
+                <div class="form-content">
+                    <h3>Survey / Feedback Form</h3>
+                    <p>Share your opinions and help us improve our services.</p>
+                    <button class="btn open-form-btn">Open Form</button>
+                </div>
+            </div>
+            
+            <!-- Order Form Card -->
+            <div class="form-card" data-form="order">
+                <div class="form-icon">
+                    <i>🛒</i>
+                </div>
+                <div class="form-content">
+                    <h3>Order Form</h3>
+                    <p>Place orders for products or services with ease.</p>
+                    <button class="btn open-form-btn">Open Form</button>
+                </div>
+            </div>
+            
+            <!-- Booking Form Card -->
+            <div class="form-card" data-form="booking">
+                <div class="form-icon">
+                    <i>📅</i>
+                </div>
+                <div class="form-content">
+                    <h3>Booking Form</h3>
+                    <p>Reserve appointments, tickets, or services in advance.</p>
+                    <button class="btn open-form-btn">Open Form</button>
+                </div>
+            </div>
+            
+            <!-- Calculation Form Card -->
+            <div class="form-card" data-form="calculation">
+                <div class="form-icon">
+                    <i>🧮</i>
+                </div>
+                <div class="form-content">
+                    <h3>Calculation Form</h3>
+                    <p>Perform various calculations with our easy-to-use tool.</p>
+                    <button class="btn open-form-btn">Open Form</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Contact Form Modal -->
+        <div id="contact-modal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Contact Us</h2>
+                    <button class="close-btn">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="success-message" id="contact-success">
+                        Thank you for your message! We'll get back to you soon.
+                    </div>
+                    <form id="contact-form">
+                        <div class="form-group">
+                            <label for="contact-name">Full Name</label>
+                            <input type="text" id="contact-name" required>
+                            <div class="error" id="contact-name-error">Please enter your name</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="contact-email">Email Address</label>
+                            <input type="email" id="contact-email" required>
+                            <div class="error" id="contact-email-error">Please enter a valid email address</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="contact-subject">Subject</label>
+                            <input type="text" id="contact-subject" required>
+                            <div class="error" id="contact-subject-error">Please enter a subject</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="contact-message">Message</label>
+                            <textarea id="contact-message" rows="5" required></textarea>
+                            <div class="error" id="contact-message-error">Please enter your message</div>
+                        </div>
+                        <div class="form-footer">
+                            <button type="button" class="btn close-modal-btn">Cancel</button>
+                            <button type="submit" class="btn">Send Message</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Registration Form Modal -->
+        <div id="registration-modal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Create Account</h2>
+                    <button class="close-btn">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="success-message" id="registration-success">
+                        Registration successful! Welcome to our platform.
+                    </div>
+                    <form id="registration-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="reg-firstname">First Name</label>
+                                <input type="text" id="reg-firstname" required>
+                                <div class="error" id="reg-firstname-error">Please enter your first name</div>
+                            </div>
+                            <div class="form-group">
+                                <label for="reg-lastname">Last Name</label>
+                                <input type="text" id="reg-lastname" required>
+                                <div class="error" id="reg-lastname-error">Please enter your last name</div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="reg-email">Email Address</label>
+                            <input type="email" id="reg-email" required>
+                            <div class="error" id="reg-email-error">Please enter a valid email address</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="reg-password">Password</label>
+                            <input type="password" id="reg-password" required>
+                            <div class="error" id="reg-password-error">Password must be at least 8 characters</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="reg-confirm">Confirm Password</label>
+                            <input type="password" id="reg-confirm" required>
+                            <div class="error" id="reg-confirm-error">Passwords do not match</div>
+                        </div>
+                        <div class="form-footer">
+                            <button type="button" class="btn close-modal-btn">Cancel</button>
+                            <button type="submit" class="btn">Register</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Login Form Modal -->
+        <div id="login-modal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Login to Your Account</h2>
+                    <button class="close-btn">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="success-message" id="login-success">
+                        Login successful! Redirecting to your dashboard...
+                    </div>
+                    <form id="login-form">
+                        <div class="form-group">
+                            <label for="login-email">Email Address</label>
+                            <input type="email" id="login-email" required>
+                            <div class="error" id="login-email-error">Please enter a valid email address</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="login-password">Password</label>
+                            <input type="password" id="login-password" required>
+                            <div class="error" id="login-password-error">Please enter your password</div>
+                        </div>
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" id="remember-me"> Remember me
+                            </label>
+                        </div>
+                        <div class="form-footer">
+                            <button type="button" class="btn close-modal-btn">Cancel</button>
+                            <button type="submit" class="btn">Login</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Survey Form Modal -->
+        <div id="survey-modal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Customer Feedback</h2>
+                    <button class="close-btn">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="success-message" id="survey-success">
+                        Thank you for your feedback! We appreciate your input.
+                    </div>
+                    <form id="survey-form">
+                        <div class="form-group">
+                            <label for="survey-name">Your Name (Optional)</label>
+                            <input type="text" id="survey-name">
+                        </div>
+                        <div class="form-group">
+                            <label for="survey-rating">Overall Satisfaction</label>
+                            <select id="survey-rating" required>
+                                <option value="">Select rating</option>
+                                <option value="5">Very Satisfied</option>
+                                <option value="4">Satisfied</option>
+                                <option value="3">Neutral</option>
+                                <option value="2">Dissatisfied</option>
+                                <option value="1">Very Dissatisfied</option>
+                            </select>
+                            <div class="error" id="survey-rating-error">Please select a rating</div>
+                        </div>
+                        <div class="form-group">
+                            <label>What did you like most?</label>
+                            <div>
+                                <label><input type="checkbox" name="liked" value="design"> Design</label>
+                                <label><input type="checkbox" name="liked" value="ease"> Ease of Use</label>
+                                <label><input type="checkbox" name="liked" value="features"> Features</label>
+                                <label><input type="checkbox" name="liked" value="support"> Customer Support</label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="survey-suggestions">Suggestions for Improvement</label>
+                            <textarea id="survey-suggestions" rows="4"></textarea>
+                        </div>
+                        <div class="form-footer">
+                            <button type="button" class="btn close-modal-btn">Cancel</button>
+                            <button type="submit" class="btn">Submit Feedback</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Order Form Modal -->
+        <div id="order-modal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Place Your Order</h2>
+                    <button class="close-btn">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="success-message" id="order-success">
+                        Order placed successfully! You will receive a confirmation email shortly.
+                    </div>
+                    <form id="order-form">
+                        <div class="form-group">
+                            <label for="order-product">Product/Service</label>
+                            <select id="order-product" required>
+                                <option value="">Select product/service</option>
+                                <option value="web-design">Web Design Package</option>
+                                <option value="consulting">Business Consulting</option>
+                                <option value="software">Custom Software</option>
+                                <option value="training">Training Program</option>
+                            </select>
+                            <div class="error" id="order-product-error">Please select a product/service</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="order-quantity">Quantity</label>
+                            <input type="number" id="order-quantity" min="1" value="1" required>
+                            <div class="error" id="order-quantity-error">Please enter a valid quantity</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="order-date">Preferred Delivery Date</label>
+                            <input type="date" id="order-date" required>
+                            <div class="error" id="order-date-error">Please select a delivery date</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="order-special">Special Instructions</label>
+                            <textarea id="order-special" rows="3"></textarea>
+                        </div>
+                        <div class="form-footer">
+                            <button type="button" class="btn close-modal-btn">Cancel</button>
+                            <button type="submit" class="btn">Place Order</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Booking Form Modal -->
+        <div id="booking-modal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Make a Booking</h2>
+                    <button class="close-btn">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="success-message" id="booking-success">
+                        Booking confirmed! You will receive a confirmation email shortly.
+                    </div>
+                    <form id="booking-form">
+                        <div class="form-group">
+                            <label for="booking-service">Service Type</label>
+                            <select id="booking-service" required>
+                                <option value="">Select service</option>
+                                <option value="consultation">Consultation</option>
+                                <option value="appointment">Appointment</option>
+                                <option value="reservation">Reservation</option>
+                                <option value="event">Event</option>
+                            </select>
+                            <div class="error" id="booking-service-error">Please select a service type</div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="booking-date">Date</label>
+                                <input type="date" id="booking-date" required>
+                                <div class="error" id="booking-date-error">Please select a date</div>
+                            </div>
+                            <div class="form-group">
+                                <label for="booking-time">Time</label>
+                                <input type="time" id="booking-time" required>
+                                <div class="error" id="booking-time-error">Please select a time</div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="booking-duration">Duration (hours)</label>
+                            <input type="number" id="booking-duration" min="1" max="8" value="1" required>
+                            <div class="error" id="booking-duration-error">Please enter a valid duration</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="booking-notes">Additional Notes</label>
+                            <textarea id="booking-notes" rows="3"></textarea>
+                        </div>
+                        <div class="form-footer">
+                            <button type="button" class="btn close-modal-btn">Cancel</button>
+                            <button type="submit" class="btn">Confirm Booking</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Calculation Form Modal -->
+        <div id="calculation-modal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Financial Calculator</h2>
+                    <button class="close-btn">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="success-message" id="calculation-success">
+                        Calculation completed successfully!
+                    </div>
+                    <form id="calculation-form">
+                        <div class="form-group">
+                            <label for="calc-type">Calculation Type</label>
+                            <select id="calc-type" required>
+                                <option value="">Select calculation type</option>
+                                <option value="loan">Loan Payment</option>
+                                <option value="investment">Investment Growth</option>
+                                <option value="currency">Currency Conversion</option>
+                                <option value="tax">Tax Calculation</option>
+                            </select>
+                            <div class="error" id="calc-type-error">Please select a calculation type</div>
+                        </div>
+                        
+                        <div id="loan-fields" class="calculation-fields">
+                            <div class="form-group">
+                                <label for="loan-amount">Loan Amount ($)</label>
+                                <input type="number" id="loan-amount" min="100" step="100">
+                            </div>
+                            <div class="form-group">
+                                <label for="interest-rate">Interest Rate (%)</label>
+                                <input type="number" id="interest-rate" min="0.1" step="0.1" max="50">
+                            </div>
+                            <div class="form-group">
+                                <label for="loan-term">Loan Term (years)</label>
+                                <input type="number" id="loan-term" min="1" max="30">
+                            </div>
+                        </div>
+                        
+                        <div id="investment-fields" class="calculation-fields" style="display: none;">
+                            <div class="form-group">
+                                <label for="investment-amount">Initial Investment ($)</label>
+                                <input type="number" id="investment-amount" min="100" step="100">
+                            </div>
+                            <div class="form-group">
+                                <label for="return-rate">Expected Return Rate (%)</label>
+                                <input type="number" id="return-rate" min="0.1" step="0.1" max="50">
+                            </div>
+                            <div class="form-group">
+                                <label for="investment-years">Investment Period (years)</label>
+                                <input type="number" id="investment-years" min="1" max="50">
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="calculation-result">Result</label>
+                            <textarea id="calculation-result" rows="4" readonly></textarea>
+                        </div>
+                        
+                        <div class="form-footer">
+                            <button type="button" class="btn close-modal-btn">Cancel</button>
+                            <button type="button" id="calculate-btn" class="btn">Calculate</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Multi-Purpose Form System &copy; 2023 | Built with HTML, CSS, JavaScript</p>
+            <p>Data Storage: JSON | Validation: JavaScript</p>
+        </footer>
+    </div>
+
+    <script>
+        // Modal functionality
+        document.querySelectorAll('.open-form-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const formCard = this.closest('.form-card');
+                const formType = formCard.getAttribute('data-form');
+                const modal = document.getElementById(`${formType}-modal`);
+                modal.style.display = 'block';
+            });
+        });
+        
+        document.querySelectorAll('.close-btn, .close-modal-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const modal = this.closest('.modal');
+                modal.style.display = 'none';
+                resetForm(modal);
+            });
+        });
+        
+        window.addEventListener('click', function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = 'none';
+                resetForm(event.target);
+            }
+        });
+        
+        // Form validation and submission
+        document.getElementById('contact-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            if (validateContactForm()) {
+                simulateDataStorage('contact', getFormData(this));
+                showSuccess('contact-success');
+            }
+        });
+        
+        document.getElementById('registration-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            if (validateRegistrationForm()) {
+                simulateDataStorage('registration', getFormData(this));
+                showSuccess('registration-success');
+            }
+        });
+        
+        document.getElementById('login-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            if (validateLoginForm()) {
+                simulateDataStorage('login', getFormData(this));
+                showSuccess('login-success');
+            }
+        });
+        
+        document.getElementById('survey-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            if (validateSurveyForm()) {
+                simulateDataStorage('survey', getFormData(this));
+                showSuccess('survey-success');
+            }
+        });
+        
+        document.getElementById('order-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            if (validateOrderForm()) {
+                simulateDataStorage('order', getFormData(this));
+                showSuccess('order-success');
+            }
+        });
+        
+        document.getElementById('booking-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            if (validateBookingForm()) {
+                simulateDataStorage('booking', getFormData(this));
+                showSuccess('booking-success');
+            }
+        });
+        
+        document.getElementById('calculate-btn').addEventListener('click', function() {
+            if (validateCalculationForm()) {
+                performCalculation();
+                showSuccess('calculation-success');
+            }
+        });
+        
+        // Calculation type change
+        document.getElementById('calc-type').addEventListener('change', function() {
+            document.querySelectorAll('.calculation-fields').forEach(field => {
+                field.style.display = 'none';
+            });
+            
+            const selectedType = this.value;
+            if (selectedType) {
+                document.getElementById(`${selectedType}-fields`).style.display = 'block';
+            }
+        });
+        
+        // Validation functions
+        function validateContactForm() {
+            let isValid = true;
+            
+            // Name validation
+            const name = document.getElementById('contact-name');
+            const nameError = document.getElementById('contact-name-error');
+            if (!name.value.trim()) {
+                nameError.style.display = 'block';
+                isValid = false;
+            } else {
+                nameError.style.display = 'none';
+            }
+            
+            // Email validation
+            const email = document.getElementById('contact-email');
+            const emailError = document.getElementById('contact-email-error');
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!email.value.trim() || !emailRegex.test(email.value)) {
+                emailError.style.display = 'block';
+                isValid = false;
+            } else {
+                emailError.style.display = 'none';
+            }
+            
+            // Subject validation
+            const subject = document.getElementById('contact-subject');
+            const subjectError = document.getElementById('contact-subject-error');
+            if (!subject.value.trim()) {
+                subjectError.style.display = 'block';
+                isValid = false;
+            } else {
+                subjectError.style.display = 'none';
+            }
+            
+            // Message validation
+            const message = document.getElementById('contact-message');
+            const messageError = document.getElementById('contact-message-error');
+            if (!message.value.trim()) {
+                messageError.style.display = 'block';
+                isValid = false;
+            } else {
+                messageError.style.display = 'none';
+            }
+            
+            return isValid;
+        }
+        
+        function validateRegistrationForm() {
+            let isValid = true;
+            
+            // First name validation
+            const firstName = document.getElementById('reg-firstname');
+            const firstNameError = document.getElementById('reg-firstname-error');
+            if (!firstName.value.trim()) {
+                firstNameError.style.display = 'block';
+                isValid = false;
+            } else {
+                firstNameError.style.display = 'none';
+            }
+            
+            // Last name validation
+            const lastName = document.getElementById('reg-lastname');
+            const lastNameError = document.getElementById('reg-lastname-error');
+            if (!lastName.value.trim()) {
+                lastNameError.style.display = 'block';
+                isValid = false;
+            } else {
+                lastNameError.style.display = 'none';
+            }
+            
+            // Email validation
+            const email = document.getElementById('reg-email');
+            const emailError = document.getElementById('reg-email-error');
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!email.value.trim() || !emailRegex.test(email.value)) {
+                emailError.style.display = 'block';
+                isValid = false;
+            } else {
+                emailError.style.display = 'none';
+            }
+            
+            // Password validation
+            const password = document.getElementById('reg-password');
+            const passwordError = document.getElementById('reg-password-error');
+            if (!password.value || password.value.length < 8) {
+                passwordError.style.display = 'block';
+                isValid = false;
+            } else {
+                passwordError.style.display = 'none';
+            }
+            
+            // Confirm password validation
+            const confirm = document.getElementById('reg-confirm');
+            const confirmError = document.getElementById('reg-confirm-error');
+            if (!confirm.value || confirm.value !== password.value) {
+                confirmError.style.display = 'block';
+                isValid = false;
+            } else {
+                confirmError.style.display = 'none';
+            }
+            
+            return isValid;
+        }
+        
+        function validateLoginForm() {
+            let isValid = true;
+            
+            // Email validation
+            const email = document.getElementById('login-email');
+            const emailError = document.getElementById('login-email-error');
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!email.value.trim() || !emailRegex.test(email.value)) {
+                emailError.style.display = 'block';
+                isValid = false;
+            } else {
+                emailError.style.display = 'none';
+            }
+            
+            // Password validation
+            const password = document.getElementById('login-password');
+            const passwordError = document.getElementById('login-password-error');
+            if (!password.value) {
+                passwordError.style.display = 'block';
+                isValid = false;
+            } else {
+                passwordError.style.display = 'none';
+            }
+            
+            return isValid;
+        }
+        
+        function validateSurveyForm() {
+            let isValid = true;
+            
+            // Rating validation
+            const rating = document.getElementById('survey-rating');
+            const ratingError = document.getElementById('survey-rating-error');
+            if (!rating.value) {
+                ratingError.style.display = 'block';
+                isValid = false;
+            } else {
+                ratingError.style.display = 'none';
+            }
+            
+            return isValid;
+        }
+        
+        function validateOrderForm() {
+            let isValid = true;
+            
+            // Product validation
+            const product = document.getElementById('order-product');
+            const productError = document.getElementById('order-product-error');
+            if (!product.value) {
+                productError.style.display = 'block';
+                isValid = false;
+            } else {
+                productError.style.display = 'none';
+            }
+            
+            // Quantity validation
+            const quantity = document.getElementById('order-quantity');
+            const quantityError = document.getElementById('order-quantity-error');
+            if (!quantity.value || quantity.value < 1) {
+                quantityError.style.display = 'block';
+                isValid = false;
+            } else {
+                quantityError.style.display = 'none';
+            }
+            
+            // Date validation
+            const date = document.getElementById('order-date');
+            const dateError = document.getElementById('order-date-error');
+            if (!date.value) {
+                dateError.style.display = 'block';
+                isValid = false;
+            } else {
+                dateError.style.display = 'none';
+            }
+            
+            return isValid;
+        }
+        
+        function validateBookingForm() {
+            let isValid = true;
+            
+            // Service validation
+            const service = document.getElementById('booking-service');
+            const serviceError = document.getElementById('booking-service-error');
+            if (!service.value) {
+                serviceError.style.display = 'block';
+                isValid = false;
+            } else {
+                serviceError.style.display = 'none';
+            }
+            
+            // Date validation
+            const date = document.getElementById('booking-date');
+            const dateError = document.getElementById('booking-date-error');
+            if (!date.value) {
+                dateError.style.display = 'block';
+                isValid = false;
+            } else {
+                dateError.style.display = 'none';
+            }
+            
+            // Time validation
+            const time = document.getElementById('booking-time');
+            const timeError = document.getElementById('booking-time-error');
+            if (!time.value) {
+                timeError.style.display = 'block';
+                isValid = false;
+            } else {
+                timeError.style.display = 'none';
+            }
+            
+            // Duration validation
+            const duration = document.getElementById('booking-duration');
+            const durationError = document.getElementById('booking-duration-error');
+            if (!duration.value || duration.value < 1 || duration.value > 8) {
+                durationError.style.display = 'block';
+                isValid = false;
+            } else {
+                durationError.style.display = 'none';
+            }
+            
+            return isValid;
+        }
+        
+        function validateCalculationForm() {
+            let isValid = true;
+            
+            // Calculation type validation
+            const calcType = document.getElementById('calc-type');
+            const calcTypeError = document.getElementById('calc-type-error');
+            if (!calcType.value) {
+                calcTypeError.style.display = 'block';
+                isValid = false;
+            } else {
+                calcTypeError.style.display = 'none';
+            }
+            
+            return isValid;
+        }
+        
+        // Helper functions
+        function getFormData(form) {
+            const formData = new FormData(form);
+            const data = {};
+            for (const [key, value] of formData.entries()) {
+                data[key] = value;
+            }
+            return data;
+        }
+        
+        function simulateDataStorage(formType, data) {
+            // In a real application, this would send data to a server
+            // For this demo, we'll just log to console and store in localStorage
+            console.log(`Storing ${formType} form data:`, data);
+            
+            // Store in localStorage as JSON
+            const storedData = JSON.parse(localStorage.getItem('formData') || '{}');
+            storedData[formType] = storedData[formType] || [];
+            storedData[formType].push({
+                ...data,
+                timestamp: new Date().toISOString()
+            });
+            
+            localStorage.setItem('formData', JSON.stringify(storedData));
+        }
+        
+        function showSuccess(elementId) {
+            const successElement = document.getElementById(elementId);
+            successElement.style.display = 'block';
+            
+            // Hide form
+            const form = successElement.nextElementSibling || successElement.parentElement.querySelector('form');
+            form.style.display = 'none';
+            
+            // Reset form after 3 seconds and close modal
+            setTimeout(() => {
+                const modal = successElement.closest('.modal');
+                modal.style.display = 'none';
+                resetForm(modal);
+            }, 3000);
+        }
+        
+        function resetForm(modal) {
+            const form = modal.querySelector('form');
+            form.reset();
+            form.style.display = 'block';
+            
+            const successMessage = modal.querySelector('.success-message');
+            if (successMessage) {
+                successMessage.style.display = 'none';
+            }
+            
+            // Hide all errors
+            modal.querySelectorAll('.error').forEach(error => {
+                error.style.display = 'none';
+            });
+            
+            // Reset calculation fields visibility
+            if (modal.id === 'calculation-modal') {
+                document.querySelectorAll('.calculation-fields').forEach(field => {
+                    field.style.display = 'none';
+                });
+                document.getElementById('calculation-result').value = '';
+            }
+        }
+        
+        function performCalculation() {
+            const calcType = document.getElementById('calc-type').value;
+            let result = '';
+            
+            if (calcType === 'loan') {
+                const amount = parseFloat(document.getElementById('loan-amount').value) || 0;
+                const rate = parseFloat(document.getElementById('interest-rate').value) || 0;
+                const term = parseFloat(document.getElementById('loan-term').value) || 0;
+                
+                const monthlyRate = rate / 100 / 12;
+                const payments = term * 12;
+                const x = Math.pow(1 + monthlyRate, payments);
+                const monthlyPayment = (amount * x * monthlyRate) / (x - 1);
+                
+                result = `Loan Calculation Results:
+- Loan Amount: $${amount.toFixed(2)}
+- Interest Rate: ${rate}%
+- Loan Term: ${term} years
+- Monthly Payment: $${monthlyPayment.toFixed(2)}
+- Total Payment: $${(monthlyPayment * payments).toFixed(2)}
+- Total Interest: $${((monthlyPayment * payments) - amount).toFixed(2)}`;
+            }
+            else if (calcType === 'investment') {
+                const amount = parseFloat(document.getElementById('investment-amount').value) || 0;
+                const rate = parseFloat(document.getElementById('return-rate').value) || 0;
+                const years = parseFloat(document.getElementById('investment-years').value) || 0;
+                
+                const futureValue = amount * Math.pow(1 + rate/100, years);
+                const interestEarned = futureValue - amount;
+                
+                result = `Investment Calculation Results:
+- Initial Investment: $${amount.toFixed(2)}
+- Expected Return Rate: ${rate}%
+- Investment Period: ${years} years
+- Future Value: $${futureValue.toFixed(2)}
+- Interest Earned: $${interestEarned.toFixed(2)}`;
+            }
+            else if (calcType === 'currency') {
+                // Simple currency conversion (using fixed rates for demo)
+                const currencies = {
+                    USD: { EUR: 0.85, GBP: 0.73, JPY: 110.0 },
+                    EUR: { USD: 1.18, GBP: 0.86, JPY: 129.5 },
+                    GBP: { USD: 1.37, EUR: 1.16, JPY: 150.8 },
+                    JPY: { USD: 0.0091, EUR: 0.0077, GBP: 0.0066 }
+                };
+                
+                result = `Currency Exchange Rates (Sample):
+- 1 USD = ${currencies.USD.EUR} EUR
+- 1 USD = ${currencies.USD.GBP} GBP
+- 1 USD = ${currencies.USD.JPY} JPY
+- 1 EUR = ${currencies.EUR.USD} USD
+- 1 GBP = ${currencies.GBP.USD} USD
+- 1 JPY = ${currencies.JPY.USD} USD`;
+            }
+            else if (calcType === 'tax') {
+                const income = parseFloat(document.getElementById('loan-amount').value) || 0; // Reusing loan amount field
+                
+                // Simple tax calculation (using US 2023 brackets for demo)
+                let tax = 0;
+                if (income <= 11000) tax = income * 0.10;
+                else if (income <= 44725) tax = 1100 + (income - 11000) * 0.12;
+                else if (income <= 95375) tax = 5147 + (income - 44725) * 0.22;
+                else if (income <= 182100) tax = 16290 + (income - 95375) * 0.24;
+                else if (income <= 231250) tax = 37104 + (income - 182100) * 0.32;
+                else if (income <= 578125) tax = 52832 + (income - 231250) * 0.35;
+                else tax = 174238.25 + (income - 578125) * 0.37;
+                
+                result = `Tax Calculation Results:
+- Annual Income: $${income.toFixed(2)}
+- Estimated Tax: $${tax.toFixed(2)}
+- Effective Tax Rate: ${((tax / income) * 100).toFixed(2)}%
+- After-Tax Income: $${(income - tax).toFixed(2)}`;
+            }
+            
+            document.getElementById('calculation-result').value = result;
+        }
+        
+        // Initialize date fields with current date
+        document.addEventListener('DOMContentLoaded', function() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('order-date').value = today;
+            document.getElementById('booking-date').value = today;
+        });
+    </script>
+</body>
+</html>
